@@ -1,0 +1,16 @@
+{% include "../partials/_head.html" %}
+{% import "partials/_mixins.html" as mixins %}
+<body>
+    <!-- BEGIN content -->
+    <div class="site-wrapper" data-router-wrapper>
+      <div data-router-view="{% if route %}{{ route }}{% else %}Template{% endif %}">
+        {% block content %}{% endblock %}
+        <!-- END content -->
+    </div>
+    </div>
+  <!-- BEGIN scripts -->
+  <script src="./js/app.js"></script>
+  <!-- END scripts -->
+
+</body>
+</html>

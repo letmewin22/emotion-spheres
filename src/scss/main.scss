@@ -1,0 +1,148 @@
+* {
+  &::selection {
+    color: white;
+    background: $accent;
+  }
+}
+
+body {
+  @include reg;
+  // color: white;
+  line-height: 1.5em;
+  font-size: size(20, 16);
+  color: #131116;
+  overflow: hidden;
+  height: 100vh;
+  background-color: #d7d8dd;
+  font-family: Helvetica;
+}
+
+#scroll-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100vh;
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: vw(1031) vw(543);
+  grid-template-rows: auto;
+  grid-row-gap: vw(32);
+  grid-column-gap: vw(176);
+  margin-top: 100px;
+  margin-bottom: 100px;
+}
+
+.js-hidden {
+  opacity: 0;
+}
+
+img {
+  position: relative;
+}
+
+.img-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.img-1 {
+  grid-column-start: 1;
+  grid-column-end: 1;
+  position: relative;
+  img {
+    max-width: 100%;
+    flex: 0 1 auto;
+    display: block;
+    object-fit: cover;
+    width: vw(810);
+    height: vw(810);
+  }
+}
+
+.img-text {
+  text-transform: uppercase;
+  font-family: Helvetica;
+  font-weight: 300;
+  margin-left: vw(36);
+  flex: 1 0 auto;
+  line-height: 1em;
+  font-size: vw(24);
+}
+
+.img-2 {
+  justify-self: end;
+  position: relative;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  img {
+    max-width: 100%;
+    display: block;
+    object-fit: cover;
+    width: vw(543);
+    height: vw(543);
+  }
+  .img-text {
+    margin-left: 0;
+    margin-top: vw(24);
+  }
+}
+
+.img-3 {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  margin-left: vw(932);
+  width: 50%;
+  object-fit: cover;
+  position: relative;
+  align-items: flex-end;
+  img {
+    max-width: 100%;
+    display: block;
+    object-fit: cover;
+    width: vw(429);
+    height: vw(429);
+  }
+}
+
+#gl {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  // pointer-events: none;
+}
+
+.text {
+  max-width: 300px;
+  position: absolute;
+  top: 400px;
+  right: 100px;
+}
+
+.js-cloned {
+  pointer-events: none;
+}
+
+.range {
+  position: fixed;
+  top: 3%;
+  right: 3%;
+  z-index: 1000000;
+}
+
+.to {
+  position: absolute;
+  width: vw(1126);
+  height: vw(684);
+  top: vw(500);
+  left: vw(85);
+  pointer-events: none;
+}
+
+.first-screen {
+  width: 100%;
+  height: 100vh;
+  background-color: #131116;
+}

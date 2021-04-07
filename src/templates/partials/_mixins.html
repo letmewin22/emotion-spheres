@@ -1,0 +1,7 @@
+{% macro h2(text, selector) %}
+  <div class="h2-wrapper">
+    <div class="h2__line h2__line--before"></div>
+    <h2 class="h2 {{selector}}">{{text|safe}}</h2>
+    <div class="h2__line h2__line--after"></div>
+  </div>
+{% endmacro %}

@@ -113,13 +113,13 @@ export default class Scene extends BaseScene {
     )
     this.camera.lookAt(this.scene.position)
     this.camera.position.z = 2
-    this.camera.position.x = -0.5
+    this.camera.position.x = -0.6
   }
 
   resize() {
     super.resize()
     this.camera.position.z = fluidSize(2, 3)
-    this.camera.position.x = fluidSize(-0.5, 0)
+    this.camera.position.x = fluidSize(-0.6, 0)
     this.world.setGravity([fluidSize(2.5, 0), 0, 0])
   }
 

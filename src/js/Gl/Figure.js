@@ -3,7 +3,9 @@ import gsap from 'gsap'
 import {fresnelShader} from './FresnelShader'
 
 import fragmentShader from './shaders/particles/fragment.glsl'
+import fragmentMobileShader from './shaders/particles/fragmentMobile.glsl'
 import vertexShader from './shaders/particles/vertex.glsl'
+import {fluidSize} from '@/utils/fluidSize'
 
 export default class Figure {
   time = 0
@@ -67,10 +69,12 @@ export default class Figure {
     this.particleMaterial = new THREE.ShaderMaterial({
       uniforms: {
         uTime: {value: 0},
+        uIterations: {type: 'uint', value: fluidSize(128, 64)},
         ...uniforms,
       },
       vertexShader,
-      fragmentShader,
+      fragmentShader:
+        window.innerWidth > 960 ? fragmentShader : fragmentMobileShader,
     })
 
     this.objects = []
@@ -83,7 +87,6 @@ export default class Figure {
       density: 2,
       restitution: 0.85,
       move: true,
-      noSleep: true,
     }
 
     const body = this.world.add({
@@ -117,7 +120,6 @@ export default class Figure {
     this.scene.add(mesh)
     this.scene.add(mesh2)
     this.scene.add(mesh3)
-    // this.scene.add(this.particleMesh)
   }
 
   update() {
@@ -125,17 +127,13 @@ export default class Figure {
       return
     }
     this.time++
-    // const m = this.particleMesh.material.uniforms
-    // m.uTime.value = this.time
+
     this.particleMaterial.uniforms.uTime.value = this.time
 
     this.objects.forEach((o) => {
       o.mesh.position.copy(o.body.getPosition())
       o.mesh.quaternion.copy(o.body.getQuaternion())
     })
-
-    // this.particleMesh.position.copy(this.objects[0].body.getPosition())
-    // this.particleMesh.quaternion.copy(this.objects[0].body.getQuaternion())
 
     this.blackhole()
   }
@@ -144,6 +142,7 @@ export default class Figure {
     if (!this.rendering) {
       return
     }
+    this.particleMaterial.uniforms.uIterations.value = fluidSize(128, 64)
   }
 
   blackhole() {

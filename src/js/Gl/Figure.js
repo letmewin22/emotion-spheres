@@ -2,8 +2,8 @@ import * as THREE from 'three'
 import gsap from 'gsap'
 import {fresnelShader} from './FresnelShader'
 
-import fragmentShader from './shaders/particles/fragment.glsl'
-import fragmentMobileShader from './shaders/particles/fragmentMobile.glsl'
+import fragmentShaderPC from './shaders/particles/fragmentPC.glsl'
+import fragmentShaderMobile from './shaders/particles/fragmentMobile.glsl'
 import vertexShader from './shaders/particles/vertex.glsl'
 import {fluidSize} from '@/utils/fluidSize'
 
@@ -74,7 +74,7 @@ export default class Figure {
       },
       vertexShader,
       fragmentShader:
-        window.innerWidth > 960 ? fragmentShader : fragmentMobileShader,
+        window.innerWidth > 960 ? fragmentShaderPC : fragmentShaderMobile,
     })
 
     this.objects = []
@@ -85,13 +85,13 @@ export default class Figure {
       type: 'sphere',
       size: [0.22, 0.22, 0.22],
       density: 2,
-      restitution: 0.85,
+      restitution: 0.9,
       move: true,
     }
 
     const body = this.world.add({
       ...params,
-      pos: [0, 0, 0],
+      pos: [0, -0.1, 0],
       rot: [0, 0, -1],
     })
 

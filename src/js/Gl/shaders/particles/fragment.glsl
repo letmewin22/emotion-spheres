@@ -6,7 +6,6 @@ varying vec3 vReflect;
 varying vec3 vRefract[3];
 varying float vReflectionFactor;
 
-const int ITERATIONS = 100;
 const float SPEED = 0.00025;
 const float PAN = 2.8;
 const float MASK_VIS = 0.0;

@@ -4,26 +4,40 @@ import {raf, resize} from '@emotionagency/utils'
 
 import Figure from './Figure'
 import BaseScene from './BaseScene'
+import {fluidSize} from '@/utils/fluidSize'
 
 export default class Scene extends BaseScene {
+  mouse = {
+    destX: 0,
+    destY: 0,
+  }
   constructor($selector) {
     super($selector)
 
-    this.init()
     this.bounds()
+    this.init()
 
     raf.on(this.animate)
     resize.on(this.resize)
   }
 
   bounds() {
-    ['animate', 'resize'].forEach((fn) => {
+    ['animate', 'resize', 'onMousemove'].forEach((fn) => {
       this[fn] = this[fn].bind(this)
     })
   }
 
   init() {
     super.init()
+    this.raycaster = new THREE.Raycaster()
+    this.audio = new Audio('./audio/1.mp3')
+    this.audio.volume = 0.1
+
+    window.addEventListener('mousemove', this.onMousemove)
+    this.light = new THREE.PointLight(0xffffff)
+    this.light.position.set(7.5, 5, 10)
+    this.scene.add(this.light)
+
     this.physics()
     this.figure = new Figure(this.scene, this.world)
   }
@@ -32,10 +46,9 @@ export default class Scene extends BaseScene {
     this.world = new OIMO.World({
       timestep: 1 / 60,
       iterations: 8,
-      broadphase: 3, // 1 brute force, 2 sweep and prune, 3 volume tree
-      worldscale: 0.1, // scale full world
-      random: true, // randomize sample
-      // gravity: [6.8, -0.01, 0],
+      broadphase: 3,
+      worldscale: 0.1,
+      random: true,
       gravity: [2.5, 0, 0],
     })
 
@@ -82,6 +95,13 @@ export default class Scene extends BaseScene {
     })
   }
 
+  onMousemove(e) {
+    const x = (e.clientX - this.sizes.w / 2) / (this.sizes.w / 2)
+    const y = (e.clientY - this.sizes.h / 2) / (this.sizes.h / 2)
+    this.mouse.destX = -x * 0.7
+    this.mouse.destY = -y * 0.7
+  }
+
   setupCamera() {
     super.setupCamera()
 
@@ -98,15 +118,30 @@ export default class Scene extends BaseScene {
 
   resize() {
     super.resize()
+    this.camera.position.z = fluidSize(2, 3)
+    this.camera.position.x = fluidSize(-0.5, 0)
+    this.world.setGravity([fluidSize(2.5, 0), 0, 0])
   }
 
   animate() {
     this.world.step()
     this.figure.update()
+
+    const intersects = this.raycaster.intersectObjects(this.scene.children)
+
+    for (let i = 0; i < intersects.length; i++) {
+      // console.log(intersects[i])
+      // this.audio.currentTime = 0
+      // this.audio.play()
+    }
+    this.scene.rotation.x += (this.mouse.destY - this.scene.rotation.x) * 0.025
+    this.scene.rotation.y += (this.mouse.destX - this.scene.rotation.y) * 0.025
+
     super.animate()
   }
 
   destroy() {
+    window.removeEventListener('mousemove', this.onMousemove)
     this.figure.destroy()
 
     raf.off(this.animate)

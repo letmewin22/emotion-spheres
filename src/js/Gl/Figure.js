@@ -1,47 +1,36 @@
 import * as THREE from 'three'
-// import gsap from 'gsap'
+import gsap from 'gsap'
+import {fresnelShader} from './FresnelShader'
+
+import fragmentShader from './shaders/particles/fragment.glsl'
+import vertexShader from './shaders/particles/vertex.glsl'
 
 export default class Figure {
   time = 0
   rendering = false
+  blackholeGravity = {value: 9.1}
 
   constructor(scene, world) {
     this.scene = scene
     this.world = world
-    this.audio = new Audio('./audio/1.mp3')
-    this.audio.volume = 0.1
 
     this.createMesh()
 
-    // const pos0 = new THREE.Vector3(0, 0, 0)
-    // const pos1 = {
-    //   x: 0,
-    // }
-    // const pos2 = {
-    //   x: 0,
-    // }
-    // document.body.onclick = () => {
-    //   console.log(this.objects[0].body.position)
-    //   gsap.to(pos0, {
-    //     duration: 1,
-    //     x: 0.6,
-    //     overwrite: true,
-    //     onUpdate: () => {
-    //       console.log(this.objects[0].body.position)
-    //       this.objects[0].body.setPosition(pos0)
-    //     },
-    //   })
-    //   // gsap.to(this.objects[1].body.position, {
-    //   //   duration: 1,
-    //   //   x: this.objects[1].body.position.x + 2,
-    //   //   overwrite: true,
-    //   // })
-    //   // gsap.to(this.objects[2].body.position, {
-    //   //   duration: 1,
-    //   //   x: this.objects[2].body.position.x - 2,
-    //   //   overwrite: true,
-    //   // })
-    // }
+    document.body.onclick = () => {
+      const tl = gsap.timeline({overwrite: true})
+      tl.to(this.blackholeGravity, {
+        duration: 0.6,
+        value: -6.1,
+      })
+      tl.to(
+        this.blackholeGravity,
+        {
+          duration: 0.6,
+          value: 9.1,
+        },
+        0.6,
+      )
+    }
   }
 
   createMesh() {
@@ -57,19 +46,42 @@ export default class Figure {
       Math.PI * 2,
     )
 
-    this.material = new THREE.MeshNormalMaterial()
+    const path = './img/world/'
+    const format = '.jpg'
+    const urls = new Array(6)
+      .fill(0)
+      .map((url) => (url = path + 'particles' + format))
+
+    this.textureCube = new THREE.CubeTextureLoader().load(urls)
+
+    const fShader = fresnelShader
+    const uniforms = THREE.UniformsUtils.clone(fShader.uniforms)
+    uniforms.tCube.value = this.textureCube
+
+    this.material = new THREE.ShaderMaterial({
+      uniforms,
+      vertexShader: fShader.vertexShader,
+      fragmentShader: fShader.fragmentShader,
+    })
+
+    this.particleMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: {value: 0},
+        ...uniforms,
+      },
+      vertexShader,
+      fragmentShader,
+    })
 
     this.objects = []
 
-    const mesh = new THREE.Mesh(this.geometry, this.material)
+    const mesh = new THREE.Mesh(this.geometry, this.particleMaterial)
 
     const params = {
       type: 'sphere',
       size: [0.22, 0.22, 0.22],
       density: 2,
-      restitution: 0.99,
-      // belongsTo: 1,
-      // collidesWith: 0xffffffff,
+      restitution: 0.85,
       move: true,
       noSleep: true,
     }
@@ -82,7 +94,7 @@ export default class Figure {
 
     this.objects.push({mesh, body})
 
-    const mesh2 = new THREE.Mesh(this.geometry, this.material)
+    const mesh2 = new THREE.Mesh(this.geometry, this.particleMaterial)
 
     const body2 = this.world.add({
       ...params,
@@ -92,7 +104,7 @@ export default class Figure {
 
     this.objects.push({mesh: mesh2, body: body2})
 
-    const mesh3 = new THREE.Mesh(this.geometry, this.material)
+    const mesh3 = new THREE.Mesh(this.geometry, this.particleMaterial)
 
     const body3 = this.world.add({
       ...params,
@@ -105,6 +117,7 @@ export default class Figure {
     this.scene.add(mesh)
     this.scene.add(mesh2)
     this.scene.add(mesh3)
+    // this.scene.add(this.particleMesh)
   }
 
   update() {
@@ -112,24 +125,18 @@ export default class Figure {
       return
     }
     this.time++
-    // const m = this.mesh.material.uniforms
+    // const m = this.particleMesh.material.uniforms
     // m.uTime.value = this.time
+    this.particleMaterial.uniforms.uTime.value = this.time
 
     this.objects.forEach((o) => {
       o.mesh.position.copy(o.body.getPosition())
+      o.mesh.quaternion.copy(o.body.getQuaternion())
     })
-    // console.log(
-    //   Math.abs(
-    //     this.objects[0].mesh.position.x - this.objects[1].mesh.position.x,
-    //   ),
-    // )
-    // if (
-    //   Math.abs(
-    //     this.objects[0].mesh.position.x - this.objects[1].mesh.position.x,
-    //   ) <= 0.5
-    // ) {
-    //   this.audio.play()
-    // }
+
+    // this.particleMesh.position.copy(this.objects[0].body.getPosition())
+    // this.particleMesh.quaternion.copy(this.objects[0].body.getQuaternion())
+
     this.blackhole()
   }
 
@@ -144,7 +151,11 @@ export default class Figure {
     const center = new THREE.Vector3(0, 0, 0)
 
     this.objects.forEach((o) => {
-      force = o.mesh.position.clone().negate().normalize().multiplyScalar(9.1)
+      force = o.mesh.position
+        .clone()
+        .negate()
+        .normalize()
+        .multiplyScalar(this.blackholeGravity.value)
       o.body.applyImpulse(center, force)
     })
   }

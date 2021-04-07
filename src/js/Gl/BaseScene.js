@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 
 export default class BaseScene {
   constructor($selector) {
@@ -28,7 +27,6 @@ export default class BaseScene {
     this.renderer.setClearColor(0xd3d3d3, 0)
 
     this.$container.appendChild(this.renderer.domElement)
-    this.controls = new OrbitControls(this.camera, this.renderer.domElement)
   }
 
   setupCamera() {}

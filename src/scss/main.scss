@@ -145,4 +145,17 @@ img {
   width: 100%;
   height: 100vh;
   background-color: #131116;
+  z-index: 1;
+  position: relative;
+  #gl {
+    z-index: -1;
+    height: 100vh;
+  }
+  .ui {
+    background-image: url('../img/ui.png');
+    background-position: 0 100%;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+  }
 }

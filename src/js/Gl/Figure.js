@@ -5,7 +5,6 @@ import {fresnelShader} from './FresnelShader'
 import fragmentShaderPC from './shaders/particles/fragmentPC.glsl'
 import fragmentShaderMobile from './shaders/particles/fragmentMobile.glsl'
 import vertexShader from './shaders/particles/vertex.glsl'
-import {fluidSize} from '@/utils/fluidSize'
 
 export default class Figure {
   time = 0
@@ -18,21 +17,14 @@ export default class Figure {
 
     this.createMesh()
 
-    document.body.onclick = () => {
-      const tl = gsap.timeline({overwrite: true})
-      tl.to(this.blackholeGravity, {
-        duration: 0.6,
-        value: -6.1,
-      })
-      tl.to(
-        this.blackholeGravity,
-        {
-          duration: 0.6,
-          value: 9.1,
-        },
-        0.6,
-      )
-    }
+    this.clickHandler = this.clickHandler.bind(this)
+
+    document.body.addEventListener('click', this.clickHandler)
+  }
+
+  createBox() {
+    const urls = new Array(6).fill('./img/world/particles.jpg')
+    this.textureCube = new THREE.CubeTextureLoader().load(urls)
   }
 
   createMesh() {
@@ -48,28 +40,20 @@ export default class Figure {
       Math.PI * 2,
     )
 
-    const path = './img/world/'
-    const format = '.jpg'
-    const urls = new Array(6)
-      .fill(0)
-      .map((url) => (url = path + 'particles' + format))
+    this.createBox()
 
-    this.textureCube = new THREE.CubeTextureLoader().load(urls)
-
-    const fShader = fresnelShader
-    const uniforms = THREE.UniformsUtils.clone(fShader.uniforms)
+    const uniforms = THREE.UniformsUtils.clone(fresnelShader.uniforms)
     uniforms.tCube.value = this.textureCube
 
     this.material = new THREE.ShaderMaterial({
       uniforms,
-      vertexShader: fShader.vertexShader,
-      fragmentShader: fShader.fragmentShader,
+      vertexShader: fresnelShader.vertexShader,
+      fragmentShader: fresnelShader.fragmentShader,
     })
 
     this.particleMaterial = new THREE.ShaderMaterial({
       uniforms: {
         uTime: {value: 0},
-        uIterations: {type: 'uint', value: fluidSize(128, 64)},
         ...uniforms,
       },
       vertexShader,
@@ -79,8 +63,6 @@ export default class Figure {
 
     this.objects = []
 
-    const mesh = new THREE.Mesh(this.geometry, this.particleMaterial)
-
     const params = {
       type: 'sphere',
       size: [0.22, 0.22, 0.22],
@@ -89,37 +71,35 @@ export default class Figure {
       move: true,
     }
 
-    const body = this.world.add({
-      ...params,
-      pos: [0, -0.1, 0],
-      rot: [0, 0, -1],
+    const obj = [
+      {pos: [0, -0.1, 0], rot: [0, 0, -1]},
+      {pos: [0, 0.6, 0], rot: [0, 0, 1]},
+      {pos: [-0.6, 0, -0.3], rot: [0, 0, -45]},
+    ]
+
+    obj.forEach((o) => {
+      const mesh = new THREE.Mesh(this.geometry, this.particleMaterial)
+      const body = this.world.add({...params, ...o})
+
+      this.objects.push({mesh, body})
+      this.scene.add(mesh)
     })
+  }
 
-    this.objects.push({mesh, body})
-
-    const mesh2 = new THREE.Mesh(this.geometry, this.particleMaterial)
-
-    const body2 = this.world.add({
-      ...params,
-      pos: [0, 0.6, 0],
-      rot: [0, 0, 1],
+  clickHandler() {
+    const tl = gsap.timeline({overwrite: true})
+    tl.to(this.blackholeGravity, {
+      duration: 0.6,
+      value: -6.1,
     })
-
-    this.objects.push({mesh: mesh2, body: body2})
-
-    const mesh3 = new THREE.Mesh(this.geometry, this.particleMaterial)
-
-    const body3 = this.world.add({
-      ...params,
-      pos: [-0.6, 0, -0.3],
-      rot: [0, 0, -45],
-    })
-
-    this.objects.push({mesh: mesh3, body: body3})
-
-    this.scene.add(mesh)
-    this.scene.add(mesh2)
-    this.scene.add(mesh3)
+    tl.to(
+      this.blackholeGravity,
+      {
+        duration: 0.6,
+        value: 9.1,
+      },
+      0.6,
+    )
   }
 
   update() {
@@ -142,7 +122,6 @@ export default class Figure {
     if (!this.rendering) {
       return
     }
-    this.particleMaterial.uniforms.uIterations.value = fluidSize(128, 64)
   }
 
   blackhole() {
@@ -157,5 +136,19 @@ export default class Figure {
         .multiplyScalar(this.blackholeGravity.value)
       o.body.applyImpulse(center, force)
     })
+  }
+
+  destroy() {
+    this.geometry.dispose()
+    this.material.dispose()
+    this.particleMaterial.dispose()
+    this.textureCube.dispose()
+
+    this.objects.forEach((o) => {
+      this.scene.remove(o.mesh)
+      o.body.remove()
+    })
+
+    document.body.removeEventListener('click', this.clickHandler)
   }
 }

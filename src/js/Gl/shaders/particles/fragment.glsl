@@ -21,9 +21,10 @@ float vortex(vec2 uv, float dist, float seed, float bias, float offset)
 void main() {
 
   vec2 uv = vUv;
-    float texel = 1.0/gl_FragCoord.y;
-    float dist = length(uv);
-    vec3 col = vec3(0.0);
+  float texel = 1.0/gl_FragCoord.y;
+  float dist = length(uv);
+  vec3 col = vec3(0.0);
+    
     for (int i=0; i<ITERATIONS; i++) 
     {
         float offset = float(i)/float(ITERATIONS);
@@ -37,8 +38,8 @@ void main() {
         float fade = time*(1.0-time);
         float mask = maskA*maskB*fade*radius;
 
-        col = mix(col, vec3(0.6* (0.5 + dist), 0.1, 3.8 + dist), mask);
-        col = max(vec3(maskA*MASK_VIS, maskB*MASK_VIS+0.1, max(maskA*MASK_VIS*2.0, maskB*MASK_VIS)+0.12)*fade, col);
+        col = mix(col, vec3(0.6 * (0.5 + dist), 0.1, 3.8 + dist), mask);
+        col = max(vec3(maskA * MASK_VIS, maskB * MASK_VIS + 0.1, max(maskA * MASK_VIS * 2.0, maskB * MASK_VIS) + 0.12) * fade, col);
     }
 
   vec4 reflectedColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );
@@ -50,7 +51,7 @@ void main() {
 
   vec4 glassTexture = mix( refractedColor, reflectedColor, clamp( vReflectionFactor, 0.0, 1.0 ) );
 
-  vec4 finalTexture = vec4(col*1.5,1.0) + glassTexture*1.7;
+  vec4 finalTexture = vec4(col*1.5,1.0) + glassTexture * 1.7;
   
   gl_FragColor = finalTexture;
 

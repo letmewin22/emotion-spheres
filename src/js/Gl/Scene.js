@@ -34,9 +34,6 @@ export default class Scene extends BaseScene {
     this.audio.volume = 0.1
 
     window.addEventListener('mousemove', this.onMousemove)
-    this.light = new THREE.PointLight(0xffffff)
-    this.light.position.set(7.5, 5, 10)
-    this.scene.add(this.light)
 
     this.physics()
     this.figure = new Figure(this.scene, this.world)
@@ -51,6 +48,8 @@ export default class Scene extends BaseScene {
       random: true,
       gravity: [2.5, 0, 0],
     })
+
+    console.log(this.world)
 
     this.ground = this.world.add({
       size: [40, 0.2, 40],
@@ -118,8 +117,9 @@ export default class Scene extends BaseScene {
 
   resize() {
     super.resize()
-    this.camera.position.z = fluidSize(2, 3)
+    this.camera.position.z = fluidSize(2, 3.5)
     this.camera.position.x = fluidSize(-0.6, 0)
+    this.camera.position.y = this.sizes.w < 960 ? -0.5 : 0
     this.world.setGravity([fluidSize(2.5, 0), 0, 0])
   }
 
@@ -143,6 +143,8 @@ export default class Scene extends BaseScene {
   destroy() {
     window.removeEventListener('mousemove', this.onMousemove)
     this.figure.destroy()
+    this.world.clear()
+    this.world.stop()
 
     raf.off(this.animate)
     resize.off(this.resize)

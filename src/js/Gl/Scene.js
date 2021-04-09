@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import * as OIMO from 'oimo'
+import GLBench from 'gl-bench/dist/gl-bench'
 import {raf, resize} from '@emotionagency/utils'
 
 import Figure from './Figure'
@@ -37,6 +38,8 @@ export default class Scene extends BaseScene {
 
     this.physics()
     this.figure = new Figure(this.scene, this.world)
+
+    this.bench = new GLBench(this.renderer.getContext())
   }
 
   physics() {
@@ -48,8 +51,6 @@ export default class Scene extends BaseScene {
       random: true,
       gravity: [2.5, 0, 0],
     })
-
-    console.log(this.world)
 
     this.ground = this.world.add({
       size: [40, 0.2, 40],
@@ -108,7 +109,7 @@ export default class Scene extends BaseScene {
       45,
       this.sizes.w / this.sizes.h,
       0.01,
-      1000,
+      10,
     )
     this.camera.lookAt(this.scene.position)
     this.camera.position.z = 2
@@ -123,7 +124,9 @@ export default class Scene extends BaseScene {
     this.world.setGravity([fluidSize(2.5, 0), 0, 0])
   }
 
-  animate() {
+  animate(now) {
+    this.bench.begin()
+    // monitored code
     this.world.step()
     this.figure.update()
 
@@ -138,6 +141,8 @@ export default class Scene extends BaseScene {
     this.scene.rotation.y += (this.mouse.destX - this.scene.rotation.y) * 0.025
 
     super.animate()
+    this.bench.end()
+    this.bench.nextFrame(now)
   }
 
   destroy() {

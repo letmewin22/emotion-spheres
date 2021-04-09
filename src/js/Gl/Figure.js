@@ -32,8 +32,8 @@ export default class Figure {
 
     this.geometry = new THREE.SphereGeometry(
       0.22,
-      50,
-      50,
+      25,
+      25,
       0,
       Math.PI * 2,
       0,

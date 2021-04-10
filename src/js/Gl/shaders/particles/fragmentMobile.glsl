@@ -1,3 +1,3 @@
-const int ITERATIONS = 50;
+const int ITERATIONS = 32;
 
 @import ./fragment;

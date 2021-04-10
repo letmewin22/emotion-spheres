@@ -30,9 +30,6 @@ export default class Scene extends BaseScene {
 
   init() {
     super.init()
-    this.raycaster = new THREE.Raycaster()
-    this.audio = new Audio('./audio/1.mp3')
-    this.audio.volume = 0.1
 
     window.addEventListener('mousemove', this.onMousemove)
 
@@ -54,21 +51,21 @@ export default class Scene extends BaseScene {
 
     this.ground = this.world.add({
       size: [40, 0.2, 40],
-      pos: [0, -0.9, 0],
+      pos: [0, -1.5, 0],
       density: 0.1,
       restitution: 1,
     })
 
     this.ceiling = this.world.add({
       size: [40, 0.2, 40],
-      pos: [0, 0.9, 0],
+      pos: [0, 1.5, 0],
       density: 0.1,
       restitution: 1,
     })
 
     this.left = this.world.add({
       size: [0.2, 40, 40],
-      pos: [-1.5, 0, 0],
+      pos: [-2.1, 0, 0],
       density: 0.1,
       restitution: 1,
     })
@@ -124,25 +121,18 @@ export default class Scene extends BaseScene {
     this.world.setGravity([fluidSize(2.5, 0), 0, 0])
   }
 
-  animate(now) {
+  animate() {
     this.bench.begin()
-    // monitored code
+
     this.world.step()
     this.figure.update()
 
-    const intersects = this.raycaster.intersectObjects(this.scene.children)
-
-    for (let i = 0; i < intersects.length; i++) {
-      // console.log(intersects[i])
-      // this.audio.currentTime = 0
-      // this.audio.play()
-    }
     this.scene.rotation.x += (this.mouse.destY - this.scene.rotation.x) * 0.025
     this.scene.rotation.y += (this.mouse.destX - this.scene.rotation.y) * 0.025
 
     super.animate()
     this.bench.end()
-    this.bench.nextFrame(now)
+    this.bench.nextFrame()
   }
 
   destroy() {

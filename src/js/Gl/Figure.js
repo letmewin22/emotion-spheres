@@ -25,12 +25,13 @@ export default class Figure {
   createBox() {
     const urls = new Array(6).fill('./img/world/particles.jpg')
     this.textureCube = new THREE.CubeTextureLoader().load(urls)
+    // this.texture = new THREE.TextureLoader().load('./img/1.png')
   }
 
   createMesh() {
     this.rendering = true
 
-    this.geometry = new THREE.SphereGeometry(
+    this.geometry = new THREE.SphereBufferGeometry(
       0.22,
       25,
       25,
@@ -46,14 +47,9 @@ export default class Figure {
     uniforms.tCube.value = this.textureCube
 
     this.material = new THREE.ShaderMaterial({
-      uniforms,
-      vertexShader: fresnelShader.vertexShader,
-      fragmentShader: fresnelShader.fragmentShader,
-    })
-
-    this.particleMaterial = new THREE.ShaderMaterial({
       uniforms: {
         uTime: {value: 0},
+        // uTexture: {value: this.texture},
         ...uniforms,
       },
       vertexShader,
@@ -78,7 +74,7 @@ export default class Figure {
     ]
 
     obj.forEach((o) => {
-      const mesh = new THREE.Mesh(this.geometry, this.particleMaterial)
+      const mesh = new THREE.Mesh(this.geometry, this.material)
       const body = this.world.add({...params, ...o})
 
       this.objects.push({mesh, body})
@@ -108,7 +104,7 @@ export default class Figure {
     }
     this.time++
 
-    this.particleMaterial.uniforms.uTime.value = this.time
+    this.material.uniforms.uTime.value = this.time
 
     this.objects.forEach((o) => {
       o.mesh.position.copy(o.body.getPosition())
@@ -141,7 +137,6 @@ export default class Figure {
   destroy() {
     this.geometry.dispose()
     this.material.dispose()
-    this.particleMaterial.dispose()
     this.textureCube.dispose()
 
     this.objects.forEach((o) => {

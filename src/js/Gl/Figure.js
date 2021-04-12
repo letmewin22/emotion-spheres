@@ -11,6 +11,8 @@ export default class Figure {
   rendering = false
   blackholeGravity = {value: 9.1}
 
+  sizes = new THREE.Vector2(window.innerWidth, window.innerHeight)
+
   constructor(scene, world) {
     this.scene = scene
     this.world = world
@@ -23,9 +25,17 @@ export default class Figure {
   }
 
   createBox() {
-    const urls = new Array(6).fill('./img/world/particles.jpg')
-    this.textureCube = new THREE.CubeTextureLoader().load(urls)
-    // this.texture = new THREE.TextureLoader().load('./img/1.png')
+    // const baseURL = './img/world/'
+    // const names = ['right', 'left', 'top', 'bottom', 'front', 'back']
+    // const urls = new Array(6).fill('./img/22.png')
+    // const urls = names.map((n) => baseURL + n + '.png')
+
+    this.textureCube = new THREE.CubeTextureLoader().load(
+      new Array(6).fill('./img/1.jpg'),
+    )
+    this.texture = new THREE.CubeTextureLoader().load(
+      new Array(6).fill('./img/1.jpg'),
+    )
   }
 
   createMesh() {
@@ -41,6 +51,8 @@ export default class Figure {
       Math.PI * 2,
     )
 
+    // this.geometry = new THREE.IcosahedronBufferGeometry(0.22, 2)
+
     this.createBox()
 
     const uniforms = THREE.UniformsUtils.clone(fresnelShader.uniforms)
@@ -49,7 +61,8 @@ export default class Figure {
     this.material = new THREE.ShaderMaterial({
       uniforms: {
         uTime: {value: 0},
-        // uTexture: {value: this.texture},
+        uTexture: {value: this.texture},
+        uScreen: {value: this.sizes},
         ...uniforms,
       },
       vertexShader,
@@ -118,6 +131,11 @@ export default class Figure {
     if (!this.rendering) {
       return
     }
+
+    this.sizes.x = window.innerWidth
+    this.sizes.y = window.innerHeight
+
+    this.material.uniforms.uScreen.value = this.sizes
   }
 
   blackhole() {

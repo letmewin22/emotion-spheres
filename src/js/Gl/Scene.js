@@ -119,12 +119,14 @@ export default class Scene extends BaseScene {
     this.camera.position.x = fluidSize(-0.6, 0)
     this.camera.position.y = this.sizes.w < 960 ? -0.5 : 0
     this.world.setGravity([fluidSize(2.5, 0), 0, 0])
+    this.figure.resize()
   }
 
   animate() {
     this.bench.begin()
 
     this.world.step()
+
     this.figure.update()
 
     this.scene.rotation.x += (this.mouse.destY - this.scene.rotation.x) * 0.025

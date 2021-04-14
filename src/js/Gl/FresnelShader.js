@@ -1,6 +1,3 @@
-import fragmentShader from './shaders/fresnel/fragment.glsl'
-import vertexShader from './shaders/fresnel/vertex.glsl'
-
 export const fresnelShader = {
   uniforms: {
     mRefractionRatio: {type: 'f', value: 1.05},
@@ -9,7 +6,4 @@ export const fresnelShader = {
     mFresnelScale: {type: 'f', value: 1.0},
     tCube: {type: 't', value: null},
   },
-
-  vertexShader,
-  fragmentShader,
 }

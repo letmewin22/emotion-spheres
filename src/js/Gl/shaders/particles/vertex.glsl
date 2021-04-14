@@ -10,9 +10,6 @@ varying vec3 vRefract[3];
 varying float vReflectionFactor;
 
 
-
-
-
 void main() {
     vUv = uv;
     vPosition = position;

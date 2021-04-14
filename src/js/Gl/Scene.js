@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import * as OIMO from 'oimo'
-import GLBench from 'gl-bench/dist/gl-bench'
 import {raf, resize} from '@emotionagency/utils'
 
 import Figure from './Figure'
@@ -35,8 +34,6 @@ export default class Scene extends BaseScene {
 
     this.physics()
     this.figure = new Figure(this.scene, this.world)
-
-    this.bench = new GLBench(this.renderer.getContext())
   }
 
   physics() {
@@ -123,18 +120,13 @@ export default class Scene extends BaseScene {
   }
 
   animate() {
-    this.bench.begin()
-
     this.world.step()
-
     this.figure.update()
 
     this.scene.rotation.x += (this.mouse.destY - this.scene.rotation.x) * 0.025
     this.scene.rotation.y += (this.mouse.destX - this.scene.rotation.y) * 0.025
 
     super.animate()
-    this.bench.end()
-    this.bench.nextFrame()
   }
 
   destroy() {

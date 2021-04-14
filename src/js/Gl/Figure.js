@@ -25,11 +25,6 @@ export default class Figure {
   }
 
   createBox() {
-    // const baseURL = './img/world/'
-    // const names = ['right', 'left', 'top', 'bottom', 'front', 'back']
-    // const urls = new Array(6).fill('./img/22.png')
-    // const urls = names.map((n) => baseURL + n + '.png')
-
     this.textureCube = new THREE.CubeTextureLoader().load(
       new Array(6).fill('./img/1.jpg'),
     )
